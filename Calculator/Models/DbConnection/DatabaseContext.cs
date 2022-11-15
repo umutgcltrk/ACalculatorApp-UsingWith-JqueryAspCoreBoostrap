@@ -6,7 +6,7 @@ namespace Calculator.Models.DbConnection
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("server=DESKTOP-E6EU0UD;database=CalculateDb;integrated security=true");
+            optionsBuilder.UseSqlServer("server=SERVERISMI;database=CalculateDb;integrated security=true");
         }
 
         public DbSet<Calculator> Calculators { get; set; }
