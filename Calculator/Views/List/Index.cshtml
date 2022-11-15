@@ -1,0 +1,38 @@
+﻿@using Calculator.Models;
+@model List<Calculator>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Geçmiş işlemleri listele</h3>
+
+@using (Html.BeginForm("Index", "List", FormMethod.Get))
+{
+    <p class="mb-0">
+        Aranacak Tarih : @Html.TextBox("p")
+        <input type="submit" class="btn btn-primary" value="Ara" />
+    </p>
+}
+<table class="table">
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">1.Sayı</th>
+        <th scope="col">Operator</th>
+        <th scope="col">2.Sayı</th>
+        <th scope="col">Sonuç</th>
+        <th scope="col">Oluşturulma Tarihi</th>
+    </tr>
+    @foreach(var item in Model){
+    <tr>
+        <td scope="row">@item.CalculatorId</td>
+        <td>@item.Number1</td>
+        <td>@item.Operator</td>
+        <td>@item.Number2</td>
+        <td>@item.Result</td>
+        <td>@item.CreateTime</td>
+    </tr>
+    }
+</table>
+<a href="/Calculator/Index"><button type="button" class="btn btn-primary btn-lg btn-block">Hesap Makinesini Kullanmak İçin TIKLA !</button></a>
+

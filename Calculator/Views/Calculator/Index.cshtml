@@ -1,0 +1,224 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+
+<html>
+    <head>
+        <title>HESAP MAKİNESİ</title>
+        
+
+        <style type="text/css" rel="stylesheet">
+        
+ body {
+  background-color: #c0c0c0;
+}
+
+p {
+  margin: 0;
+  font-family: Pacifico;
+  position: relative;
+  left: 5%;
+}
+
+.calculator {
+  position: relative;
+  margin: 1em auto;
+  padding: 1em 0;
+  display: block-inline;
+  width: 350px;
+  background-color: #444;
+  border-radius: 25px;
+  box-shadow: 5px 5px 15px 3px #111;
+  font-family: 'Oxygen';
+}
+
+.calc-row {
+  text-align: center;
+}
+
+.calc-row div.screen {
+  font-family: Droid Sans Mono;
+  display: table;
+  width: 85%;
+  background-color: #aaa;
+  text-align: right;
+  font-size: 2em;
+  min-height: 1.2em;
+  margin-left: 0.5em;
+  padding-right: 0.5em;
+  border: 1px solid #888;
+  color: #333;
+}
+
+.calc-row div {
+  text-align: center;
+  display: inline-block;
+  font-weight: bold;
+  border: 1px solid #555;
+  background-color: #eee;
+  padding: 10px 0;
+  margin: 7px 5px;
+  border-radius: 15px;
+  box-shadow: 2px 2px 1px 1px #222;
+  width: 50px;
+}
+.calc-row .button {
+cursor: pointer;
+}
+.calc-row div.zero {
+  width: 112px;
+}
+
+.calc-row div.zero {
+  margin-right: 5px;
+}
+        
+    </style>
+    </head>
+    <body>
+
+   <div class="calculator">
+
+  <div class="calc-row">
+    <div class="screen">0123456789</div>
+  </div>
+  
+  <div class="calc-row">
+    <div class="button">C</div>
+    <div class="button">CE</div>
+    <div class="button backspace">geri</div>
+    <div class="button plus-minus">+/-</div>
+    <div class="button"></div>
+  </div>
+  
+  <div class="calc-row">
+    <div class="button">7</div>
+    <div class="button">8</div>
+    <div class="button">9</div>
+    <div class="button divice">/</div>
+    <div class="button"> </div>
+  </div>
+  
+  <div class="calc-row">
+    <div class="button">4</div>
+    <div class="button">5</div>
+    <div class="button">6</div>
+    <div class="button multiply">*</div>
+    <div class="button"> </div>
+  </div>
+  
+  <div class="calc-row">
+    <div class="button">1</div>
+    <div class="button">2</div>
+    <div class="button">3</div>
+    <div class="button">-</div>
+    <div class="button"> </div>
+  </div>
+  
+  <div class="calc-row">
+    <div class="button zero">0</div>
+    <div class="button decimal">.</div>
+    <div class="button">+</div>
+    <div class="button equal" id="clickEqual">=</div>
+  </div>
+</div>
+
+
+    </body>
+    <script src="~/js/script.js"></script>
+    
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+ <script>
+  $(document).ready(function() {
+  var result = 0;
+  var prevEntry = 0;
+  var operation = null;
+  var currentEntry = '0';
+  var finalEntry = '0'
+  updateScreen(result);
+  
+  
+
+  
+  $('.button').on('click', function(evt) { //buton class ına basılınca
+    var buttonPressed = $(this).html(); //buton classının içerğine ulaştı ve buttonPressed değişkenine atadı.
+    console.log(buttonPressed);  // console yazdırdı
+   
+
+   
+    if (buttonPressed === "C") {
+      result = 0;
+      currentEntry = '0';
+    } else if (buttonPressed === "CE") {
+      currentEntry = '0';
+    } else if (buttonPressed === "geri") {
+      currentEntry = currentEntry.substring(0, currentEntry.length-1);
+    } else if (buttonPressed === "+/-") {
+      currentEntry *= -1;
+    } else if (buttonPressed === '.') {
+      currentEntry += '.';
+    } else if (isNumber(buttonPressed)) {
+      if (currentEntry === '0') currentEntry = buttonPressed;
+      else currentEntry = currentEntry + buttonPressed;//
+    } else if (isOperator(buttonPressed)) {
+      prevEntry = parseFloat(currentEntry);
+      operation = buttonPressed;
+      currentEntry = '';                               //
+    } else if (buttonPressed === '=') { //Burda değerleri istediğim gibi alıyorum.
+        console.log("İlk değer:"+prevEntry+" Operator: "+operation+" İkinci değer: "+currentEntry);
+
+        let calculateValues = {
+        Number1: prevEntry,
+        Operator: operation,
+        Number2: currentEntry,
+        Result: result
+        };
+
+        $.ajax({
+        type: "post",
+        url: "/Calculator/Index/",
+        data: calculateValues,
+        success:function(func){
+           let result1 = jQuery.parseJSON(func);
+           alert("İşlem başarılı , veritabanına kayıt edildi !");
+       }
+      });
+
+      currentEntry = operate(prevEntry, currentEntry, operation);
+       console.log("Sonuç : "+currentEntry)
+
+      //operation = null;
+    }
+    
+    updateScreen(currentEntry);
+  });
+  
+});
+
+updateScreen = function(displayValue) {
+  var displayValue = displayValue.toString();
+  $('.screen').html(displayValue.substring(0, 10));
+};
+
+isNumber = function(value) {
+  return !isNaN(value);
+}
+
+isOperator = function(value) {
+  return value === '/' || value === '*' || value === '+' || value === '-';
+};
+
+operate = function(a, b, operation) {
+  a = parseFloat(a);
+  b = parseFloat(b);
+  console.log(a, b, operation); //toplama işleminde burayı yazdırdı
+  if (operation === '+') return a + b;
+  if (operation === '-') return a - b;
+  if (operation === '*') return a * b;
+  if (operation === '/') return a / b;
+}
+    </script>
+</html>
+
